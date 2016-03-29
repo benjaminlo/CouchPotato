@@ -9,17 +9,16 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-/**
- * Created by Benjamin on 27/03/2016.
- */
-public class ImageAdapter extends ArrayAdapter {
+import java.util.ArrayList;
+
+public class ImageAdapter extends ArrayAdapter <String> {
     private Context context;
     private LayoutInflater inflater;
+    private ArrayList<String> imageUrls;
 
-    private String[] imageUrls;
-
-    public ImageAdapter (Context context, String[] imageUrls) {
+    public ImageAdapter (Context context, ArrayList<String> imageUrls) {
         super(context, R.layout.item_image, imageUrls);
+
         this.context = context;
         this.imageUrls = imageUrls;
 
@@ -33,7 +32,7 @@ public class ImageAdapter extends ArrayAdapter {
 
         Picasso
                 .with(context)
-                .load(imageUrls[position])
+                .load(imageUrls.get(position))
                 .fit()
                 .into((ImageView) convertView);
 
