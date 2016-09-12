@@ -7,15 +7,24 @@
     tools:context=".GridFragment"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <GridView
-        android:id="@+id/gridview_posters"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnWidth="100dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center" />
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <GridView
+            android:id="@+id/gridview_posters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnWidth="100dp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="columnWidth"
+            android:gravity="center" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </FrameLayout>

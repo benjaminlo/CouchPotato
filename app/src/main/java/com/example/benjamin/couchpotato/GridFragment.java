@@ -6,11 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +29,9 @@ import java.util.ArrayList;
 
 public class GridFragment extends Fragment {
 
+    GridView gridView;
+    SwipeRefreshLayout swipeRefreshLayout;
+
     private ImageAdapter mPosterAdapter;
 
     public GridFragment() {
@@ -38,17 +44,25 @@ public class GridFragment extends Fragment {
 
         mPosterAdapter = new ImageAdapter(getActivity(), new ArrayList<String>());
 
-        GridView gridView = (GridView) rootView.findViewById(R.id.gridview_posters);
+        gridView = (GridView) rootView.findViewById(R.id.gridview_posters);
         gridView.setAdapter(mPosterAdapter);
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                Toast.makeText(getActivity(), "TEST", Toast.LENGTH_SHORT).show();
-//                Toast.makeText(getActivity(), "Updating content...", Toast.LENGTH_SHORT).show();
-//                updateContent();
-//            }
-//        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Toast.makeText(getActivity(), "Poster clicked!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(
+            new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    updateContent();
+                }
+            }
+        );
 
         return rootView;
     }
@@ -58,6 +72,7 @@ public class GridFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()); //TODO: Add SharedPreferences
         String category = prefs.getString("category", "popular");
         contentTask.execute(category);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -71,6 +86,9 @@ public class GridFragment extends Fragment {
         private final String LOG_TAG = FetchContentTask.class.getSimpleName();
 
         private String[] getPosterUrlsFromJson(String contentJsonStr) throws JSONException {
+
+            if (contentJsonStr == null)
+                return null;
 
             Log.d(LOG_TAG, contentJsonStr);
 
@@ -138,7 +156,7 @@ public class GridFragment extends Fragment {
 
                 contentJsonStr = buffer.toString();
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error", e);
+                Log.e(LOG_TAG, "Network error", e);
             } finally {
                 if (urlConnection != null)
                     urlConnection.disconnect();
@@ -167,6 +185,8 @@ public class GridFragment extends Fragment {
                 mPosterAdapter.clear();
                 for (String item : result)
                     mPosterAdapter.add(item);
+            } else {
+                Toast.makeText(getActivity(), "No content found. Please check network connectivity.", Toast.LENGTH_SHORT).show();
             }
         }
     }
